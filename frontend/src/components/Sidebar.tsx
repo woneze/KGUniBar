@@ -94,7 +94,12 @@ function Sidebar() {
         </div>
 
         <div className="menu-spacer"></div>
-        <div className="menu-item">Setting</div>
+        <div 
+          className={`menu-item ${location.pathname === '/setting' ? 'active' : ''}`}
+          onClick={() => navigate('/setting')}
+        >
+          Setting
+        </div>
       </div>
     </div>
   )

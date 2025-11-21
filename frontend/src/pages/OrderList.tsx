@@ -1,10 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import './OrderList.css'
 
 function OrderList() {
   const navigate = useNavigate()
+  const [tableCount, setTableCount] = useState<number>(8)
+
+  // localStorage에서 테이블 수 불러오기
+  useEffect(() => {
+    const savedTableCount = localStorage.getItem('tableCount')
+    if (savedTableCount) {
+      setTableCount(parseInt(savedTableCount, 10))
+    }
+  }, [])
+
+  // 테이블 수가 변경될 때마다 업데이트 (다른 탭에서 변경했을 경우)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTableCount = localStorage.getItem('tableCount')
+      if (savedTableCount) {
+        setTableCount(parseInt(savedTableCount, 10))
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    // 같은 탭에서 변경된 경우를 위해 interval로 체크
+    const interval = setInterval(() => {
+      const savedTableCount = localStorage.getItem('tableCount')
+      if (savedTableCount && parseInt(savedTableCount, 10) !== tableCount) {
+        setTableCount(parseInt(savedTableCount, 10))
+      }
+    }, 500)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [tableCount])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -22,15 +55,12 @@ function OrderList() {
     return `${year}.${month}.${day} (${weekday})`
   }
 
-  // 테이블 데이터 (예시)
-  const tables = [
-    { id: 1, name: '1번 테이블', menus: ['메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1'] },
-    { id: 2, name: '2번 테이블', menus: [] },
-    { id: 3, name: '3번 테이블', menus: ['메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1'] },
-    { id: 4, name: '4번 테이블', menus: ['메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1'] },
-    { id: 5, name: '5번 테이블', menus: ['메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1'] },
-    { id: 6, name: '6번 테이블', menus: ['메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1', '메뉴명 X 1'] },
-  ]
+  // 테이블 데이터 생성 (설정된 테이블 수만큼)
+  const tables = Array.from({ length: tableCount }, (_, index) => ({
+    id: index + 1,
+    name: `${index + 1}번 테이블`,
+    menus: [] // 초기에는 주문 없음
+  }))
 
   const handleTableClick = (tableId: number) => {
     navigate(`/order/${tableId}`)

@@ -9,6 +9,7 @@ import OrderDetail from './pages/OrderDetail.tsx'
 import Reservation from './pages/Reservation.tsx'
 import RemainingOrders from './pages/RemainingOrders.tsx'
 import AllOrders from './pages/AllOrders.tsx'
+import Setting from './pages/Setting.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/order/:tableId" element={<OrderDetail />} />
         <Route path="/remaining-orders" element={<RemainingOrders />} />
         <Route path="/all-orders" element={<AllOrders />} />
+        <Route path="/setting" element={<Setting />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

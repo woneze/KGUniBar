@@ -1,0 +1,237 @@
+.setting-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-header {
+  height: 50px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #d9d9d9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.header-date {
+  font-size: 14px;
+}
+
+.header-greeting {
+  font-size: 14px;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.setting-content {
+  padding: 40px;
+  flex: 1;
+}
+
+.setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.setting-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* 탭 버튼 */
+.setting-tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.setting-tab {
+  padding: 10px 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.setting-tab:hover {
+  background-color: #f5f5f5;
+}
+
+.setting-tab.active {
+  background-color: #f7f2fe;
+  border-color: #9747ff;
+  color: #9747ff;
+  font-weight: 700;
+}
+
+/* 테이블 수량 섹션 */
+.table-count-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table-count-label {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.table-count-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count-button {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #757575;
+  border-radius: 2px;
+  background-color: #ffffff;
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.count-button:hover {
+  background-color: #f5f5f5;
+}
+
+.count-value {
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  min-width: 30px;
+  text-align: center;
+}
+
+.save-button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #f7f2fe;
+  font-size: 14px;
+  font-weight: 700;
+  color: #9747ff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.save-button:hover {
+  background-color: #e8d5ff;
+}
+
+/* 메뉴 섹션 */
+.menu-section {
+  padding: 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  min-height: 200px;
+}
+
+/* QR 코드 섹션 */
+.qrcode-section {
+  padding: 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  min-height: 200px;
+}
+
+/* 확인 팝업 */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-modal {
+  background-color: #ffffff;
+  border: 1px solid #757575;
+  border-radius: 8px;
+  padding: 30px;
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.confirm-modal-title {
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 20px;
+}
+
+.confirm-modal-message {
+  font-size: 16px;
+  color: #000000;
+  margin-bottom: 30px;
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+.confirm-button {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-button.cancel {
+  background-color: #ffffff;
+  border: 1px solid #9747ff;
+  color: #000000;
+}
+
+.confirm-button.cancel:hover {
+  background-color: #f5f5f5;
+}
+
+.confirm-button.confirm {
+  background-color: #9747ff;
+  color: #ffffff;
+}
+
+.confirm-button.confirm:hover {
+  background-color: #8533e6;
+}
+
