@@ -63,12 +63,34 @@ function OrderList() {
       const orders: {[key: number]: any[]} = {}
       
       for (let i = 1; i <= tableCount; i++) {
+        const allTableOrders: any[] = []
+        
+        // 아직 결제되지 않은 주문 내역
         const savedOrders = localStorage.getItem(`tableOrders_${i}`)
         if (savedOrders) {
-          orders[i] = JSON.parse(savedOrders)
-        } else {
-          orders[i] = []
+          try {
+            const pendingOrders = JSON.parse(savedOrders)
+            allTableOrders.push(...pendingOrders)
+          } catch (e) {
+            // 에러 처리
+          }
         }
+        
+        // 결제 완료된 주문 내역 (테이블 종료 전까지)
+        const completedOrders = localStorage.getItem(`tableCompletedOrders_${i}`)
+        if (completedOrders) {
+          try {
+            const completed = JSON.parse(completedOrders)
+            // 각 결제 완료된 주문의 items를 추가
+            completed.forEach((order: any) => {
+              allTableOrders.push(...order.items)
+            })
+          } catch (e) {
+            // 에러 처리
+          }
+        }
+        
+        orders[i] = allTableOrders
       }
       
       setTableOrders(orders)
@@ -77,11 +99,18 @@ function OrderList() {
     loadTableOrders()
     
     // 주문 내역이 변경될 때마다 업데이트
+    const handleStorageChange = () => {
+      loadTableOrders()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    // 같은 탭에서 변경된 경우를 위해 interval로 체크
     const interval = setInterval(() => {
       loadTableOrders()
-    }, 500)
+    }, 300)
 
     return () => {
+      window.removeEventListener('storage', handleStorageChange)
       clearInterval(interval)
     }
   }, [tableCount])
@@ -90,10 +119,24 @@ function OrderList() {
   const tables = Array.from({ length: tableCount }, (_, index) => {
     const tableId = index + 1
     const orders = tableOrders[tableId] || []
+    
+    // 같은 메뉴가 여러 번 주문된 경우 합치기
+    const menuMap: {[key: string]: number} = {}
+    orders.forEach((item: any) => {
+      const menuName = item.name
+      if (menuMap[menuName]) {
+        menuMap[menuName] += item.quantity
+      } else {
+        menuMap[menuName] = item.quantity
+      }
+    })
+    
+    const menus = Object.entries(menuMap).map(([name, quantity]) => `${name} x${quantity}`)
+    
     return {
       id: tableId,
       name: `${tableId}번 테이블`,
-      menus: orders.map((item: any) => `${item.name} x${item.quantity}`)
+      menus: menus
     }
   })
 

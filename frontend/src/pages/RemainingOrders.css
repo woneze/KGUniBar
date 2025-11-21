@@ -81,6 +81,12 @@
   font-weight: 500;
 }
 
+.order-time {
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+}
+
 .order-items {
   display: flex;
   flex-direction: column;
@@ -123,5 +129,84 @@
 
 .complete-button:active {
   background-color: #7329cc;
+}
+
+.empty-orders-message {
+  text-align: center;
+  color: #999;
+  font-size: 18px;
+  padding: 60px 0;
+}
+
+/* 조리 완료 확인 팝업 */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-modal {
+  background-color: #ffffff;
+  border: 1px solid #757575;
+  border-radius: 8px;
+  padding: 30px;
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.confirm-modal-title {
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 20px;
+}
+
+.confirm-modal-message {
+  font-size: 16px;
+  color: #000000;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+.confirm-button {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-button.cancel {
+  background-color: #ffffff;
+  border: 1px solid #9747ff;
+  color: #000000;
+}
+
+.confirm-button.cancel:hover {
+  background-color: #f5f5f5;
+}
+
+.confirm-button.confirm {
+  background-color: #9747ff;
+  color: #ffffff;
+}
+
+.confirm-button.confirm:hover {
+  background-color: #8533e6;
 }
 

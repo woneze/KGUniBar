@@ -189,7 +189,12 @@ function OrderDetail() {
     const currentOrderCount = parseInt(localStorage.getItem('totalOrderCount') || '0')
     localStorage.setItem('totalOrderCount', (currentOrderCount + 1).toString())
 
-    // 테이블 주문 내역 초기화
+    // 결제 완료된 주문을 테이블별로 저장 (테이블 종료 전까지 홀 주문 페이지에 표시하기 위해)
+    const tableCompletedOrders = JSON.parse(localStorage.getItem(`tableCompletedOrders_${tableId}`) || '[]')
+    tableCompletedOrders.push(newOrder)
+    localStorage.setItem(`tableCompletedOrders_${tableId}`, JSON.stringify(tableCompletedOrders))
+
+    // 테이블 주문 내역 초기화 (새로운 주문을 받을 수 있도록)
     setOrderItems([])
     localStorage.removeItem(`tableOrders_${tableId}`)
     
@@ -207,6 +212,8 @@ function OrderDetail() {
     // 테이블 주문 내역 초기화
     setOrderItems([])
     localStorage.removeItem(`tableOrders_${tableId}`)
+    // 결제 완료된 주문 내역도 초기화
+    localStorage.removeItem(`tableCompletedOrders_${tableId}`)
     
     setIsTableEndModalOpen(false)
   }

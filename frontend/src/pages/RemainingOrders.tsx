@@ -9,63 +9,55 @@ interface OrderItem {
   quantity: number
 }
 
-interface TableOrder {
+interface Order {
+  id: number
   tableId: number
   tableName: string
   items: OrderItem[]
-  completedAt?: string
+  orderTime: string
+  totalPrice?: number
+  isCompleted?: boolean
 }
 
 function RemainingOrders() {
   const navigate = useNavigate()
-  const [tableOrders, setTableOrders] = useState<TableOrder[]>([])
-  const [tableCount, setTableCount] = useState<number>(8)
+  const [orders, setOrders] = useState<Order[]>([])
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+  const [selectedOrderInfo, setSelectedOrderInfo] = useState<Order | null>(null)
 
-  // localStorage에서 테이블 수 불러오기
+  // localStorage에서 전체 주문 내역 불러오기 (조리 완료되지 않은 것만)
   useEffect(() => {
-    const savedTableCount = localStorage.getItem('tableCount')
-    if (savedTableCount) {
-      setTableCount(parseInt(savedTableCount, 10))
-    }
-  }, [])
-
-  // localStorage에서 테이블별 주문 내역 불러오기
-  useEffect(() => {
-    const loadTableOrders = () => {
-      const orders: TableOrder[] = []
+    const loadRemainingOrders = () => {
+      const allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]')
+      const completedOrderIds = JSON.parse(localStorage.getItem('completedOrderIds') || '[]')
       
-      for (let i = 1; i <= tableCount; i++) {
-        const savedOrders = localStorage.getItem(`tableOrders_${i}`)
-        if (savedOrders) {
-          const items = JSON.parse(savedOrders)
-          if (items.length > 0) {
-            orders.push({
-              tableId: i,
-              tableName: `${i}번 테이블`,
-              items: items.map((item: any) => ({
-                id: item.menuId,
-                name: item.name,
-                quantity: item.quantity
-              }))
-            })
-          }
-        }
-      }
+      // 조리 완료되지 않은 주문만 필터링
+      const remainingOrders = allOrders.filter((order: Order) => 
+        !completedOrderIds.includes(order.id)
+      )
       
-      setTableOrders(orders)
+      setOrders(remainingOrders)
     }
     
-    loadTableOrders()
+    loadRemainingOrders()
     
     // 주문 내역이 변경될 때마다 업데이트
+    const handleStorageChange = () => {
+      loadRemainingOrders()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    // 같은 탭에서 변경된 경우를 위해 interval로 체크
     const interval = setInterval(() => {
-      loadTableOrders()
+      loadRemainingOrders()
     }, 500)
 
     return () => {
+      window.removeEventListener('storage', handleStorageChange)
       clearInterval(interval)
     }
-  }, [tableCount])
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -83,21 +75,34 @@ function RemainingOrders() {
     return `${year}.${month}.${day} (${weekday})`
   }
 
-  // 현재 시간 포맷팅 (HH:MM)
-  const getCurrentTime = () => {
-    const now = new Date()
-    const hours = String(now.getHours()).padStart(2, '0')
-    const minutes = String(now.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
+  const handleCompleteClick = (order: Order) => {
+    setSelectedOrderId(order.id)
+    setSelectedOrderInfo(order)
+    setIsCompleteModalOpen(true)
   }
 
-  const handleComplete = (tableId: number) => {
-    const completedTime = getCurrentTime()
-    setTableOrders(tableOrders.map(order => 
-      order.tableId === tableId 
-        ? { ...order, completedAt: completedTime }
-        : order
-    ))
+  const handleConfirmComplete = () => {
+    if (selectedOrderId === null) return
+
+    // 조리 완료된 주문 ID를 localStorage에 저장
+    const completedOrderIds = JSON.parse(localStorage.getItem('completedOrderIds') || '[]')
+    if (!completedOrderIds.includes(selectedOrderId)) {
+      completedOrderIds.push(selectedOrderId)
+      localStorage.setItem('completedOrderIds', JSON.stringify(completedOrderIds))
+      
+      // 상태 업데이트
+      setOrders(orders.filter(order => order.id !== selectedOrderId))
+    }
+
+    setIsCompleteModalOpen(false)
+    setSelectedOrderId(null)
+    setSelectedOrderInfo(null)
+  }
+
+  const handleCancelComplete = () => {
+    setIsCompleteModalOpen(false)
+    setSelectedOrderId(null)
+    setSelectedOrderInfo(null)
   }
 
   return (
@@ -122,37 +127,60 @@ function RemainingOrders() {
 
           {/* 주문 목록 */}
           <div className="orders-list">
-            {tableOrders.map((tableOrder) => (
-              <div key={tableOrder.tableId} className="order-card">
-                <div className="order-card-header">
-                  <h3 className="table-name">{tableOrder.tableName}</h3>
-                  {tableOrder.completedAt && (
-                    <div className="completed-time">
-                      조리 완료: {tableOrder.completedAt}
-                    </div>
-                  )}
-                </div>
-                <div className="order-items">
-                  {tableOrder.items.map((item) => (
-                    <div key={item.id} className="order-item">
-                      <span className="item-name">{item.name}</span>
-                      <span className="item-quantity">X {item.quantity}</span>
-                    </div>
-                  ))}
-                </div>
-                {!tableOrder.completedAt && (
+            {orders.length === 0 ? (
+              <div className="empty-orders-message">조리 완료되지 않은 주문이 없습니다.</div>
+            ) : (
+              orders.map((order) => (
+                <div key={order.id} className="order-card">
+                  <div className="order-card-header">
+                    <h3 className="table-name">{order.tableName}</h3>
+                    <div className="order-time">주문 시간: {order.orderTime}</div>
+                  </div>
+                  <div className="order-items">
+                    {order.items.map((item) => (
+                      <div key={item.id} className="order-item">
+                        <span className="item-name">{item.name}</span>
+                        <span className="item-quantity">X {item.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
                   <button 
                     className="complete-button"
-                    onClick={() => handleComplete(tableOrder.tableId)}
+                    onClick={() => handleCompleteClick(order)}
                   >
                     조리 완료
                   </button>
-                )}
-              </div>
-            ))}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      {/* 조리 완료 확인 팝업 */}
+      {isCompleteModalOpen && selectedOrderInfo && (
+        <div className="confirm-modal-overlay" onClick={handleCancelComplete}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="confirm-modal-title">조리 완료</h2>
+            <p className="confirm-modal-message">
+              {selectedOrderInfo.tableName}의 주문이 조리 완료되었습니까?<br />
+              <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                {selectedOrderInfo.items.map((item, index) => (
+                  <div key={index}>{item.name} X {item.quantity}</div>
+                ))}
+              </div>
+            </p>
+            <div className="confirm-modal-buttons">
+              <button className="confirm-button cancel" onClick={handleCancelComplete}>
+                취소
+              </button>
+              <button className="confirm-button confirm" onClick={handleConfirmComplete}>
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
